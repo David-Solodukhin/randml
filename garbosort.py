@@ -33,6 +33,11 @@ class State:
         tmp = self.arr[action.i1]
         self.arr[action.i1] = self.arr[action.i2]
         self.arr[action.i2] = tmp
+def isSorted(arr):
+    for i in range(arr.size-1):
+         if arr[i+1] < arr[i] :
+               return False
+    return True
 
 class Environment():
     def __init__(self, arr):
@@ -101,9 +106,11 @@ class Environment():
                 ans += (cycle_size - 1) 
         # return answer 
         return -(ans) + 5
+        #should also factor in if the nums are in sorted position?
+        # 6274
 
 class Agent(): #and environment
-    def __init__(self, epsilon=0.1, discount=0.5, alpha=0.9):
+    def __init__(self, epsilon=0.05, discount=0.3, alpha=0.9):
         self.q_values = dict()
         self.epsilon = epsilon
         self.discount = discount
@@ -121,8 +128,8 @@ class Agent(): #and environment
         return actions_list
 
     def getQValue(self, state, action):
-        if (np.array_equal(state.arr, [1,2,3,4])):
-            tmp = self.q_values.setdefault(tuple([state,action]), 10)
+        if (isSorted(state.arr)):
+            tmp = self.q_values.setdefault(tuple([state,action]), 30)
             return tmp
         else:
             tmp = self.q_values.setdefault(tuple([state,action]), 0)
@@ -178,25 +185,25 @@ if __name__ == '__main__':
 
     #generate random 4 digit arr
     #do this 1000 times until it gets it
-    for i in range(0, 5000):
-        if (i == 4999):
-            print("last iteration:")
-        env = Environment(np.array(random.sample(range(1,5),4)))
+    for i in range(0, 10000):
+        if (i == 9999):
+            print("last iteration:", flush=True)
+        env = Environment(np.array(random.sample(range(1,9),4)))
         while True:
             #print("current env arr: " + str(env.state.arr))
             agent_action = agent.getAction(env.state)
             if (agent_action is None):
-                print("already sorted")
+                print("already sorted" , flush=True)
                 break
             cur_state = State(env.state.arr) #copy state
             env.update(agent_action)
             reward = env.getReward()
-            if (i == 4999):
-                print("-----------")
-                print("current env arr: " + str(cur_state.arr))
-                print("agent action: " + str(agent_action.i1) + str(agent_action.i2))
-                print("env arr after action: " + str(env.state.arr))
-                print("agent's reward: " + str(reward))
+            if (i == 9999):
+                print("-----------", flush=True)
+                print("current env arr: " + str(cur_state.arr), flush=True)
+                print("agent action: " + str(agent_action.i1) + str(agent_action.i2), flush=True)
+                print("env arr after action: " + str(env.state.arr), flush=True)
+                print("agent's reward: " + str(reward), flush=True)
             #print("-----------")
             #print("agent action: " + str(agent_action.i1) + str(agent_action.i2))
             #print("env arr after action: " + str(env.state.arr))
@@ -206,7 +213,7 @@ if __name__ == '__main__':
             #print(env.state.arr)
             #print(reward)
             agent.update(cur_state, agent_action, env.state, reward)
-            if (np.array_equal(env.state.arr, [1,2,3,4])):
+            if (isSorted(env.state.arr)):
                 #print("found-----------------------------")   
                 #print("qvalue table -------------:")
                 #for key, value in agent.q_values.items():
@@ -217,6 +224,7 @@ if __name__ == '__main__':
             #for key, value in agent.q_values.items():
             #    print("key:{} [{},{}], value:{}".format(key[0].arr,key[1].i1, key[1].i2,value))
             #print("qvalue table end-----------")
+    #arr = np.array([5,1,2,4])
 
    
 
